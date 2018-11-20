@@ -1,0 +1,18 @@
+---
+- hosts: all
+  vars:
+    http_port: 80
+    max_clients: 200
+  remote_user: root
+  tasks:
+  - name: ensure apache is at the latest version
+    yum:
+  - name: Install nginx
+    apk: name=nginx state=present
+    
+  - name: Creates directory for vhosts
+    file: path=/etc/nginx/sites state=directory
+
+  - name: Install default vhost conf
+    template: src=default.conf dest=/etc/nginx/sites/default.conf
+    notify: restart nginx
