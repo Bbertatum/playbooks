@@ -1,0 +1,35 @@
+---
+# Installe puppet-agent pour la formation puppet
+# pre-requis : apt install ansible
+# lancer : ansible-playbook -i localhost, install-puppet-agent.yml
+- hosts: all
+  remote_user: root
+  environment:
+          PATH: "PATH=/opt/puppetlabs/bin:/usr/bin/:/bin"
+  vars: 
+    puppetserver: "192.168.1.25"
+
+
+  tasks:
+  - name: Install puppet repos
+    apt:
+      deb: https://apt.puppetlabs.com/puppet5-release-bionic.deb 
+      force: yes
+  - name: Update the repository cache and install puppet-agent
+    apt:
+      name: puppet-agent
+      state: latest
+      update_cache: yes
+  - name: update .bashrc for puppet
+    lineinfile:
+      path: ~/.bashrc
+      regexp: 'export PATH=/opt/puppetlabs/bin:$PATH'
+      line: 'export PATH=/opt/puppetlabs/bin:$PATH'
+  - name: update /etc/hosts with our puppetserver
+    lineinfile:
+      path: /etc/hosts
+      regexp: "{{puppetserver}} puppet"
+      line: "{{puppetserver}} puppet"
+  - name: Run puppet agent once again
+    puppet:
+
